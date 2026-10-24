@@ -25,9 +25,10 @@ const initialCards = [
   },
 ];
 
+// Perfil
 const editProfileButton = document.querySelector(".profile__edit-button");
 const editProfileModal = document.querySelector("#edit-popup");
-const editProfileCloseButton = editProfileModal.querySelector(".popup__close");
+const editProfileForm = editProfileModal.querySelector("#edit-profile-form");
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
 const profileNameInput = editProfileModal.querySelector(
@@ -36,23 +37,29 @@ const profileNameInput = editProfileModal.querySelector(
 const profileDescriptionInput = editProfileModal.querySelector(
   ".popup__input_type_description",
 );
-const editProfileForm = editProfileModal.querySelector("#edit-profile-form");
+
+// Cartões
 const cardTemplate = document
   .querySelector("#card-template")
   .content.querySelector(".card");
 const cardsList = document.querySelector(".cards__list");
+
+// Novo local
 const addCardButton = document.querySelector(".profile__add-button");
 const newCardModal = document.querySelector("#new-card-popup");
-const newCardCloseButton = newCardModal.querySelector(".popup__close");
 const newCardForm = newCardModal.querySelector("#new-card-form");
 const cardNameInput = newCardModal.querySelector(
   ".popup__input_type_card-name",
 );
 const cardLinkInput = newCardModal.querySelector(".popup__input_type_url");
+
+// Imagem
 const imageModal = document.querySelector("#image-popup");
-const imageModalCloseButton = imageModal.querySelector(".popup__close");
 const imageModalImage = imageModal.querySelector(".popup__image");
 const imageModalCaption = imageModal.querySelector(".popup__caption");
+
+// Todos os botões de fechar
+const closeButtons = document.querySelectorAll(".popup__close");
 
 function openModal(modal) {
   modal.classList.add("popup_is-opened");
@@ -79,6 +86,22 @@ function handleProfileFormSubmit(evt) {
   profileDescription.textContent = profileDescriptionInput.value;
 
   closeModal(editProfileModal);
+}
+
+function handleLikeButtonClick(likeButton) {
+  likeButton.classList.toggle("card__like-button_is-active");
+}
+
+function handleDeleteCardClick(cardElement) {
+  cardElement.remove();
+}
+
+function handleCardImageClick(name, link) {
+  imageModalImage.src = link;
+  imageModalImage.alt = name;
+  imageModalCaption.textContent = name;
+
+  openModal(imageModal);
 }
 
 function getCardElement({
@@ -110,58 +133,38 @@ function getCardElement({
   return cardElement;
 }
 
-function renderCard(name, link, container) {
-  const cardElement = getCardElement({ name, link });
+function renderCard(cardData, container) {
+  const cardElement = getCardElement(cardData);
   container.prepend(cardElement);
 }
 
 function handleCardFormSubmit(evt) {
   evt.preventDefault();
 
-  renderCard(cardNameInput.value, cardLinkInput.value, cardsList);
+  renderCard(
+    { name: cardNameInput.value, link: cardLinkInput.value },
+    cardsList,
+  );
 
   closeModal(newCardModal);
   newCardForm.reset();
 }
 
-function handleLikeButtonClick(likeButton) {
-  likeButton.classList.toggle("card__like-button_is-active");
-}
-
-function handleDeleteCardClick(cardElement) {
-  cardElement.remove();
-}
-
-function handleCardImageClick(name, link) {
-  imageModalImage.src = link;
-  imageModalImage.alt = name;
-  imageModalCaption.textContent = name;
-
-  openModal(imageModal);
-}
-
 editProfileButton.addEventListener("click", handleOpenEditModal);
-
-editProfileCloseButton.addEventListener("click", function () {
-  closeModal(editProfileModal);
-});
-
 editProfileForm.addEventListener("submit", handleProfileFormSubmit);
 
 addCardButton.addEventListener("click", function () {
   openModal(newCardModal);
 });
-
-newCardCloseButton.addEventListener("click", function () {
-  closeModal(newCardModal);
-});
-
 newCardForm.addEventListener("submit", handleCardFormSubmit);
 
-imageModalCloseButton.addEventListener("click", function () {
-  closeModal(imageModal);
+closeButtons.forEach((button) => {
+  const popup = button.closest(".popup");
+  button.addEventListener("click", function () {
+    closeModal(popup);
+  });
 });
 
 initialCards.forEach((card) => {
-  renderCard(card.name, card.link, cardsList);
+  renderCard(card, cardsList);
 });
